@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:browse="urn:import:org.roda.wui.client.browse">
 
 	<ui:style>
@@ -16,6 +16,7 @@
 
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+			<m:ContextMenu ui:field="contextMenu" />
 			<g:FlowPanel addStyleNames="row full_width skip_padding">
 				<g:FlowPanel addStyleNames="col_10 content">
 					<!-- HEADER -->

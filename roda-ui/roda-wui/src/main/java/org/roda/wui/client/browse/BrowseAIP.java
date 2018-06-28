@@ -39,6 +39,7 @@ import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -48,6 +49,7 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.main.ContextMenu;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
@@ -238,6 +240,9 @@ public class BrowseAIP extends Composite {
 
   @UiField
   Button searchAIP;
+
+  @UiField
+  ContextMenu<IndexedAIP> contextMenu;
 
   private List<HandlerRegistration> handlers;
 
@@ -446,7 +451,11 @@ public class BrowseAIP extends Composite {
     aipChildrenList.setVisible(false);
     aipChildrenList.getParent().setVisible(false);
 
-    actionsSidebar.setVisible(false);
+    //actionsSidebar.setVisible(false);
+
+    Label emptyHelpText = new Label(messages.tableActionEmptyHelp());
+    emptyHelpText.addStyleName("actions-empty-help");
+    contextMenu.setPopupWidget(emptyHelpText);
 
     searchSection.setVisible(true);
 
@@ -557,8 +566,8 @@ public class BrowseAIP extends Composite {
       aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
       // SIDEBAR
-      actionsSidebar.setVisible(true);
-      actionsSidebar.setWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
+      //actionsSidebar.setVisible(true);
+      contextMenu.setPopupWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -781,8 +790,8 @@ public class BrowseAIP extends Composite {
     aipChildrenList.setVisible(true);
     aipChildrenList.getParent().setVisible(true);
 
-    actionsSidebar.setVisible(true);
-    actionsSidebar.setWidget(
+    //actionsSidebar.setVisible(true);
+    contextMenu.setPopupWidget(
       AipActions.get().createActionsLayout(AipActions.NO_AIP_OBJECT, new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override
@@ -805,6 +814,8 @@ public class BrowseAIP extends Composite {
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);
+
+    contextMenu.init(AipActions.get());
 
     WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }

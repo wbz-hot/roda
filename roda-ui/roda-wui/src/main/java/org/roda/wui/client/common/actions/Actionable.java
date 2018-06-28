@@ -13,7 +13,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface Actionable<T extends IsIndexed> {
+public interface Actionable<T extends IsIndexed>{
 
   static interface Action<T> {
 

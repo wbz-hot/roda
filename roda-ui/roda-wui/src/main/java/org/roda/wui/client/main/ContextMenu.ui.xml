@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+			 xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
+			 xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+			 xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+			 xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse"
+			 xmlns:s="urn:import:org.roda.wui.client.common.slider">
+
+	<ui:style>
+	</ui:style>
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
+		<g:FlowPanel addStyleNames="contextMenu">
+			<g:Label addStyleNames="contextMenuItemHeader" ui:field="browseItemHeader">
+				<ui:text from='{messages.catalogueFileTitle}' />
+				&rsaquo;
+			</g:Label>
+			<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="contextMenuBreadcrumb" />
+
+			<g:FlowPanel addStyleNames="contextMenuIcons">
+				<wcag:AccessibleFocusPanel addStyleNames="toolbarLink" ui:field="button">
+					<g:HTML><i class="fa fa-ellipsis-v"></i></g:HTML>
+				</wcag:AccessibleFocusPanel>
+
+
+
+				<!--
+				<wcag:AccessibleFocusPanel addStyleNames="toolbarLink">
+					<g:HTML><i class="fa fa-list-alt"></i></g:HTML>
+				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel addStyleNames="toolbarLink">
+					<g:HTML><i class="fa fa-chevron-left"></i></g:HTML>
+				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel addStyleNames="toolbarLink">
+					<g:HTML><i class="fa fa-chevron-right"></i></g:HTML>
+				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel addStyleNames="toolbarLink">
+					<g:HTML><i class="fa fa-ellipsis-v"></i></g:HTML>
+				</wcag:AccessibleFocusPanel>
+				-->
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</wcag:AccessibleFocusPanel>
+</ui:UiBinder>

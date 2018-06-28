@@ -1973,6 +1973,42 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
+              CONTEXT MENU
+************************************************/
+
+.contextMenu {
+    min-height: 35px;
+    line-height: 35px;
+    background-color: #ddd;
+    position: relative;
+}
+
+.contextMenu .contextMenuItemHeader {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 40px;
+    margin-right: 2px;
+    font-size: 1.4rem;
+    color: #222;
+}
+
+.contextMenu .contextMenuBreadcrumb {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.contextMenu .contextMenuBreadcrumb {
+    margin-left: 35px;
+}
+
+.contextMenu .contextMenuIcons {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/**********************************************
 				SIDEBAR
 ************************************************/
 
