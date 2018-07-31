@@ -244,4 +244,6 @@ public class JobSearch extends Composite implements EntitySearch {
   public void setFilter(Filter filter) {
     jobsSearchResultPanel.setFilter(filter);
   }
+
+
 }

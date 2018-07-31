@@ -105,23 +105,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-stop" ui:field="buttonStop">
-								<ui:text from='{messages.stopButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonAppraisal">
-								<ui:text from='{messages.sidebarAppraisalTitle}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonProcess">
-								<ui:text from='{messages.listButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonBack">
-								<ui:text from='{messages.backButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

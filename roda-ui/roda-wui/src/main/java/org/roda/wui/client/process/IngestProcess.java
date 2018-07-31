@@ -12,11 +12,14 @@ package org.roda.wui.client.process;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -96,13 +99,16 @@ public class IngestProcess extends Composite {
   @UiField(provided = true)
   JobSearch jobSearch;
 
-  @UiField
-  Button newJob;
+  @UiField SimplePanel actionsSidebar;
 
   private IngestProcess() {
     Filter ingestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
+
+    Actionable jobActions = JobActions.get(IngestTransfer.RESOLVER);
+
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", ingestFilter, true);
+    jobSearch.getList().setActionable(jobActions);
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }
@@ -111,11 +117,6 @@ public class IngestProcess extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
-  }
-
-  @UiHandler("newJob")
-  void handleNewJobAction(ClickEvent e) {
-    HistoryUtils.newHistory(IngestTransfer.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

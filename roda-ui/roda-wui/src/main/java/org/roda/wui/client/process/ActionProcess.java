@@ -12,6 +12,7 @@ package org.roda.wui.client.process;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -79,6 +80,7 @@ public class ActionProcess extends Composite {
 
   @UiField
   Button newJob;
+  @UiField SimplePanel actionsSidebar;
 
   private static ActionProcess instance = null;
 
