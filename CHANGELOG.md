@@ -3,7 +3,7 @@
 ## v2.2.13 (25/10/2018)
 Install for demonstration:
 ```
-docker pull keeps/roda:v2.2.12
+docker pull keeps/roda:v2.2.13
 ```
 
 
