@@ -1,15 +1,21 @@
 package org.roda.core.events.akka;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NodeExistsException;
+import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ZkManager;
 import org.roda.core.common.akka.AkkaUtils;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.data.common.RodaConstants;
@@ -45,9 +51,10 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
   private ActorRef eventsNotifierAndHandlerActor;
   private String instanceSenderId;
   private boolean shuttingDown = false;
+  private Config akkaConfig;
 
   public AkkaEventsHandlerAndNotifier() {
-    Config akkaConfig = AkkaUtils.getAkkaConfiguration("events.conf");
+    akkaConfig = AkkaUtils.getAkkaConfiguration("events.conf");
     eventsSystem = ActorSystem.create(EVENTS_SYSTEM, akkaConfig);
 
     List<Address> seedNodesAddresses = getSeedNodesAddresses();
@@ -144,44 +151,88 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
   }
 
   private List<Address> getSeedNodesAddresses() {
-    List<Address> seedNodes = new ArrayList<Address>();
+    List<Address> seedNodesAddresses = new ArrayList<Address>();
 
     if (RodaCoreFactory.getProperty("core.events.akka.seeds_via_list", false)) {
       int i = 1;
       while (i != -1) {
         String seed = RodaCoreFactory.getProperty("core.events.akka.seeds." + i, null);
         if (seed != null) {
-          processAndAddSeedNode(seedNodes, seed);
+          processAndAddSeedNode(seedNodesAddresses, seed);
           i++;
         } else {
           i = -1;
         }
       }
     } else {
-      ZooKeeper zkClient;
       try {
         String connectString = RodaCoreFactory.getProperty(RodaConstants.CORE_SOLR_CLOUD_URLS, "localhost:2181");
-        String zkSeedsNode = RodaCoreFactory.getProperty("core.events.akka.zk.seeds_path",
+        String seedsNodePath = RodaCoreFactory.getProperty("core.events.akka.zk.seeds_path",
           "/akka/cluster/events/seeds");
-        zkClient = new ZooKeeper(connectString, 2000, event -> {
-          // do nothing and carry on
-        });
+        ZkManager zkManager = new ZkManager(connectString);
 
-        zkClient.getChildren(zkSeedsNode, false).forEach(seed -> {
-          try {
-            String node = new String(zkClient.getData(zkSeedsNode + "/" + seed, null, null),
-              RodaConstants.DEFAULT_ENCODING);
-            processAndAddSeedNode(seedNodes, node);
-          } catch (KeeperException | InterruptedException | UnsupportedEncodingException e) {
-            // do nothing and carry on
-          }
-        });
-      } catch (IOException | KeeperException | InterruptedException e) {
+        createZkPath(zkManager.getZookeeper(), seedsNodePath, "");
+
+        getAlreadyExistingSeeds(zkManager, seedsNodePath, seedNodesAddresses);
+
+        registerMyselfAsSeed(zkManager, seedsNodePath);
+      } catch (KeeperException | InterruptedException e) {
         // do nothing and carry on
       }
     }
 
-    return seedNodes;
+    return seedNodesAddresses;
+  }
+
+  private void registerMyselfAsSeed(final ZkManager zkManager, final String seedsNodePath) {
+    try {
+      String hostIpAddress = InetAddress.getLocalHost().getHostAddress();
+      String port = akkaConfig.getString("akka.remote.netty.tcp.port");
+
+      String myInfo = hostIpAddress + "#" + port;
+      String myPath = seedsNodePath + "/" + myInfo;
+
+      if (zkManager.exists(myPath)) {
+        zkManager.update(myPath, myInfo.getBytes());
+      } else {
+        zkManager.create(myPath, myInfo.getBytes());
+      }
+    } catch (UnknownHostException | KeeperException | InterruptedException e) {
+      // do nothing
+    }
+  }
+
+  private void getAlreadyExistingSeeds(ZkManager zkManager, String zkSeedsNode, List<Address> seedNodes)
+    throws KeeperException, InterruptedException {
+    zkManager.getZookeeper().getChildren(zkSeedsNode, false).forEach(seed -> {
+      try {
+        String node = new String(zkManager.getZookeeper().getData(zkSeedsNode + "/" + seed, null, null),
+          RodaConstants.DEFAULT_ENCODING);
+        processAndAddSeedNode(seedNodes, node);
+      } catch (KeeperException | InterruptedException | UnsupportedEncodingException e) {
+        // do nothing and carry on
+      }
+    });
+  }
+
+  private void createZkPath(final ZooKeeper zkClient, final String nodePath, final String nodeContent) {
+    List<ACL> acl = ZooDefs.Ids.OPEN_ACL_UNSAFE;
+    String[] pathParts = nodePath.split("/");
+    StringBuilder path = new StringBuilder();
+    // "i = 1" because of the first slash
+    for (int i = 1; i < pathParts.length; i++) {
+      path.append("/").append(pathParts[i]);
+      String pathString = path.toString();
+      // send requests to create all parts of the path without waiting for the
+      // results of previous calls to return
+      try {
+        zkClient.create(pathString, nodeContent.getBytes(), acl, CreateMode.PERSISTENT);
+      } catch (NodeExistsException e) {
+        // do nothing and carry on
+      } catch (KeeperException | InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   private void processAndAddSeedNode(List<Address> seedNodes, String node) {
@@ -189,6 +240,7 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
       return;
     }
     try {
+      // using # as separator because of ipv6
       String[] nodeParts = node.split("#", 2);
       seedNodes.add(new Address("akka.tcp", EVENTS_SYSTEM, nodeParts[0], Integer.parseInt(nodeParts[1])));
     } catch (NumberFormatException | IndexOutOfBoundsException e) {

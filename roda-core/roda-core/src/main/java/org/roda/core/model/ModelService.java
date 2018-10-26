@@ -1784,7 +1784,7 @@ public class ModelService extends ModelObservable {
       entryLogLineNumber++;
 
       // emit event
-      if (notify && writeIsAllowed) {
+      if (notify) {
         notifyLogEntryCreated(logEntry).failOnError();
       }
     }
