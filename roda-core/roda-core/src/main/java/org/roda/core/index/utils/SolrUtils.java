@@ -802,7 +802,7 @@ public class SolrUtils {
       appendBasicSearch(ret, param.getName(), param.getValue(), "AND", prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof EmptyKeyFilterParameter) {
       EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
-      appendANDOperator(ret, true);
+      appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
       ret.append("(*:* NOT " + param.getName() + ":*)");
     } else if (parameter instanceof DateRangeFilterParameter) {
       DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
@@ -1219,7 +1219,7 @@ public class SolrUtils {
         }
 
       } catch (GenericException | NotSupportedException | RequestNotValidException | NotFoundException
-        | AuthorizationDeniedException | SolrServerException | IOException e) {
+        | AuthorizationDeniedException | SolrServerException | SolrException | IOException e) {
         LOGGER.error("Error adding document to index", e);
         ret.add(e);
       }
