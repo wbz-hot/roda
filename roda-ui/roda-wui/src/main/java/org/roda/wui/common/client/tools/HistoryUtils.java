@@ -56,6 +56,7 @@ import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -77,13 +78,14 @@ public class HistoryUtils {
   public static final String HISTORY_SEP_ESCAPE = "%2F";
   public static final String HISTORY_PERMISSION_SEP = ".";
 
+  private static boolean alertOnPageChange = false;
+
   public static <T> List<T> tail(List<T> list) {
     return ListUtils.tail(list);
   }
 
   public static <T> List<T> removeLast(List<T> list) {
     return list.subList(0, list.size() - 1);
-
   }
 
   /**
@@ -136,12 +138,12 @@ public class HistoryUtils {
 
   public static void newHistory(List<String> path) {
     String hash = createHistoryToken(path);
-    Window.Location.assign("#" + hash);
+    historyChangeWrapper(() -> Window.Location.assign("#" + hash));
   }
 
   public static void replaceHistory(List<String> path) {
     String hash = createHistoryToken(path);
-    Window.Location.replace("#" + hash);
+    historyChangeWrapper(() -> Window.Location.replace("#" + hash));
   }
 
   public static void newHistory(HistoryResolver resolver) {
@@ -444,4 +446,22 @@ public class HistoryUtils {
     return Arrays.asList(UUID_RESOLVER.getHistoryToken(), objectClass, objectUUID);
   }
 
+  public static void alertOnPageChange(boolean activate) {
+    alertOnPageChange = activate;
+  }
+
+  private static void historyChangeWrapper(Runnable historyChangeAction) {
+    if (alertOnPageChange) {
+      boolean clickedOk = Window.confirm("teste");
+      if (clickedOk) {
+        GWT.log("clicked ok");
+        alertOnPageChange(false);
+        historyChangeAction.run();
+      } else {
+        GWT.log("clicked cancel");
+      }
+    } else {
+      historyChangeAction.run();
+    }
+  }
 }

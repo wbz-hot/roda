@@ -128,6 +128,8 @@ public class JavascriptUtils {
                     // either via the browse button, or via drag/drop:
                     add : function(e, data) {
 
+                      @org.roda.wui.common.client.tools.HistoryUtils.a
+
                       $wnd.jQuery('.btn').prop(
                           'disabled', true);
                       $wnd.jQuery('#upload-message')

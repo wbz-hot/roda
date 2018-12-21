@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.event.logical.shared.AttachEvent;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
@@ -304,6 +305,17 @@ public class TransferUpload extends Composite {
 
   @UiHandler("done")
   void buttonDoneHandler(ClickEvent e) {
+
+    done.addAttachHandler(new AttachEvent.Handler() {
+      @Override public void onAttachOrDetach(AttachEvent event) {
+        if(event.isAttached()){
+
+        }else{
+
+        }
+      }
+    });
+
     if (isIngest) {
       if (resource != null) {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
